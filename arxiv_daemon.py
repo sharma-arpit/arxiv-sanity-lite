@@ -30,7 +30,18 @@ if __name__ == '__main__':
     """
 
     # query string of papers to look for
-    q = 'cat:cs.CV+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.AI+OR+cat:cs.NE+OR+cat:cs.RO'
+    # q = 'cat:cs.CV+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.AI+OR+cat:cs.NE+OR+cat:cs.RO'
+    tags = ['stat.ML', 'stat.ME', 'stat.TH', 'eess.IV', 'eess.SP', 'eess.AS', 'quant-ph', 'physics.optics',
+            'physics.data-an', 'physics.class-ph', 'physics.app-ph', 'physics.atm-clus', 'physics.comp-ph',
+            'physics.plasm-ph', 'cond-mat.stat-mech', 'cond-mat.supr-con', 'cs.CV', 'cs.LG', 'cs.CL', 'cs.AI',
+            'cs.NE', 'cs.RO']
+
+    formatted_tags = []
+
+    for tag in tags:
+        formatted_tags.append(f'cat:{tag}')
+
+    q = "+OR+".join(formatted_tags)
 
     pdb = get_papers_db(flag='c')
     mdb = get_metas_db(flag='c')
