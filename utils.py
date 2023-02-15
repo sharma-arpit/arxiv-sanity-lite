@@ -173,7 +173,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--start', type=int, default=0, help='start at what index')
     parser.add_argument('-b', '--break_after', type=int, default=3, help='how many 0 new papers in a row would cause '
                                                                          'us to stop early? or 0 to disable.')
-    parser.add_argument('-n', '--num_f', type=int, default=20000, help='number of tfidf features')
+    parser.add_argument('--num_f', type=int, default=20000, help='number of tfidf features')
     parser.add_argument('--min_df', type=int, default=5, help='min df')
     parser.add_argument('--max_df', type=float, default=0.1, help='max df')
     parser.add_argument('--max_docs', type=int, default=-1, help='maximum number of documents to use when '

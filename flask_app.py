@@ -20,20 +20,16 @@ from flask import Flask, request, redirect, url_for
 from flask import render_template
 from flask import g  # global session-level object
 from flask import session
-from flask_redislite import FlaskRedis
 from aslite.db import get_papers_db, get_metas_db, get_tags_db, get_last_active_db, get_email_db
 from aslite.db import load_features
 from utils import Arxiv, Compute
-import rq
-
+import subprocess
 # -----------------------------------------------------------------------------
 # inits and globals
 
 RET_NUM = 25  # number of papers to return per page
 
 app = Flask(__name__)
-curr_dir = pathlib.Path(__file__).parent.resolve()
-REDISLITE_PATH = os.path.join(curr_dir, 'data', 'file.rdb')
 
 # set the secret key so we can cryptographically sign cookies and maintain sessions
 if os.path.isfile('secret_key.txt'):
@@ -44,12 +40,6 @@ else:
     print("WARNING: no secret key found, using default devkey")
     sk = 'devkey'
 app.secret_key = sk
-rdb = FlaskRedis(app, rq=True)
-
-with app.app_context():
-    rdb.start_worker()
-
-queue = rdb.queue
 
 
 # -----------------------------------------------------------------------------
@@ -517,7 +507,9 @@ def login():
 @app.route('/refresh', methods=["POST"])
 def refresh_papers():
 
-    queue['default'].enqueue(refresh, ttl=60, result_ttl=60, job_id='321')
+    # refresh(num_of_papers=int(request.form.get('papers')))
+    command = ["python", "utils.py", "--num", request.form.get('papers')]
+    subprocess.run(command)
 
     return redirect(url_for('main'))
 
