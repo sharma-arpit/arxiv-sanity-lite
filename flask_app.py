@@ -48,7 +48,7 @@ def get_tags():
     if g.user is None:
         return {}
     if not hasattr(g, '_tags'):
-        with get_tags_db() as tags_db:
+        with get_tags_db(flag='c') as tags_db:
             tags_dict = tags_db[g.user] if g.user in tags_db else {}
         g._tags = tags_dict
     return g._tags
