@@ -5,14 +5,14 @@ Any of the file system I/O and the associated settings are in this single file.
 """
 
 import os
+import pathlib
 import sqlite3, zlib, pickle, tempfile
 from sqlitedict import SqliteDict
 from contextlib import contextmanager
 
 # -----------------------------------------------------------------------------
 # global configuration
-curr_dir = os.path.dirname(os.path.abspath(__file__)).split("/")[0]
-
+curr_dir = pathlib.Path(__file__).parent.resolve().parent.resolve()
 DATA_DIR = os.path.join(curr_dir, 'data')
 
 
