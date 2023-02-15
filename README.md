@@ -47,6 +47,9 @@ All of the database will be stored inside the `data` directory. Finally, if you'
 - Make website mobile friendly with media queries in css etc
 - The metas table should not be a sqlitedict but a proper sqlite table, for efficiency
 - Build a reverse index to support faster search, right now we iterate through the entire database
+- Add ability to refresh the database of papers and rank them in the front end
+- Allow users to choose the tags they want to refresh papers for and how many papers they want to refresh
+- Show only those tags that user want to see instead of showing all tags
 
 #### License
 
