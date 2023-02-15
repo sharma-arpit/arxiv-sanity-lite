@@ -11,8 +11,9 @@ from contextlib import contextmanager
 
 # -----------------------------------------------------------------------------
 # global configuration
+curr_dir = os.path.dirname(os.path.abspath(__file__)).split("/")[0]
 
-DATA_DIR = 'data'
+DATA_DIR = os.path.join(curr_dir, 'data')
 
 
 # -----------------------------------------------------------------------------
