@@ -36,7 +36,7 @@ if __name__ == '__main__':
         assert isinstance(training, bool)
 
         # determine which papers we will use to build tfidf
-        if training and args.max_docs > 0 and args.max_docs < len(pdb):
+        if training and 0 < args.max_docs < len(pdb):
             # crop to a random subset of papers
             keys = list(pdb.keys())
             shuffle(keys)

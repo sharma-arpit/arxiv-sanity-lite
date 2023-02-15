@@ -8,6 +8,7 @@ ideas:
 """
 
 import os
+import pathlib
 import re
 import time
 from random import shuffle
@@ -19,9 +20,11 @@ from flask import Flask, request, redirect, url_for
 from flask import render_template
 from flask import g  # global session-level object
 from flask import session
-
+from flask_redislite import FlaskRedis
 from aslite.db import get_papers_db, get_metas_db, get_tags_db, get_last_active_db, get_email_db
 from aslite.db import load_features
+from utils import Arxiv, Compute
+import rq
 
 # -----------------------------------------------------------------------------
 # inits and globals
@@ -29,6 +32,8 @@ from aslite.db import load_features
 RET_NUM = 25  # number of papers to return per page
 
 app = Flask(__name__)
+curr_dir = pathlib.Path(__file__).parent.resolve()
+REDISLITE_PATH = os.path.join(curr_dir, 'data', 'file.rdb')
 
 # set the secret key so we can cryptographically sign cookies and maintain sessions
 if os.path.isfile('secret_key.txt'):
@@ -39,10 +44,30 @@ else:
     print("WARNING: no secret key found, using default devkey")
     sk = 'devkey'
 app.secret_key = sk
+rdb = FlaskRedis(app, rq=True)
+
+with app.app_context():
+    rdb.start_worker()
+
+queue = rdb.queue
 
 
 # -----------------------------------------------------------------------------
 # globals that manage the (lazy) loading of various state for a request
+def refresh(num_of_papers=1000):
+
+    arxiv_engine = Arxiv(num=num_of_papers, start=0, break_after=3)
+
+    arxiv_engine.format_api_query()
+
+    arxiv_engine.fetch_papers()
+
+    comp = Compute(num=20000, min_df=5, max_df=0.1, max_docs=-1)
+
+    comp.train()
+
+    return True
+
 
 def get_tags():
     if g.user is None:
@@ -206,8 +231,7 @@ def search_rank(q: str = ''):
 
 def default_context():
     # any global context across all pages, e.g. related to the current user
-    context = {}
-    context['user'] = g.user if g.user is not None else ''
+    context = {'user': g.user if g.user is not None else ''}
     return context
 
 
@@ -488,6 +512,14 @@ def login():
             session['user'] = username
 
     return redirect(url_for('profile'))
+
+
+@app.route('/refresh', methods=["POST"])
+def refresh_papers():
+
+    queue['default'].enqueue(refresh, ttl=60, result_ttl=60, job_id='321')
+
+    return redirect(url_for('main'))
 
 
 @app.route('/logout')
