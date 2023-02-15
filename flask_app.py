@@ -348,7 +348,7 @@ def inspect():
 @app.route('/profile')
 def profile():
     context = default_context()
-    with get_email_db() as edb:
+    with get_email_db(flag='c') as edb:
         email = edb.get(g.user, '')
         context['email'] = email
     return render_template('profile.html', **context)
