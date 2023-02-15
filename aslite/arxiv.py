@@ -10,12 +10,13 @@ from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
+
 def get_response(search_query, start_index=0):
     """ pings arxiv.org API to fetch a batch of 100 papers """
     # fetch raw response
     base_url = 'http://export.arxiv.org/api/query?'
     add_url = 'search_query=%s&sortBy=lastUpdatedDate&start=%d&max_results=100' % (search_query, start_index)
-    #add_url = 'search_query=%s&sortBy=submittedDate&start=%d&max_results=100' % (search_query, start_index)
+    # add_url = 'search_query=%s&sortBy=submittedDate&start=%d&max_results=100' % (search_query, start_index)
     search_query = base_url + add_url
     logger.debug(f"Searching arxiv for {search_query}")
     with urllib.request.urlopen(search_query) as url:
@@ -26,6 +27,7 @@ def get_response(search_query, start_index=0):
 
     return response
 
+
 def encode_feedparser_dict(d):
     """ helper function to strip feedparser objects using a deep copy """
     if isinstance(d, feedparser.FeedParserDict) or isinstance(d, dict):
@@ -34,6 +36,7 @@ def encode_feedparser_dict(d):
         return [encode_feedparser_dict(k) for k in d]
     else:
         return d
+
 
 def parse_arxiv_url(url):
     """
@@ -46,6 +49,7 @@ def parse_arxiv_url(url):
     parts = idv.split('v')
     assert len(parts) == 2, 'error splitting id and version in idv string: ' + idv
     return idv, parts[0], int(parts[1])
+
 
 def parse_response(response):
 
@@ -66,6 +70,7 @@ def parse_response(response):
         out.append(j)
 
     return out
+
 
 def filter_latest_version(idvs):
     """

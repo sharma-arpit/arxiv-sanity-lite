@@ -55,7 +55,7 @@ if __name__ == '__main__':
     total_updated = 0
     zero_updates_in_a_row = 0
     for k in range(args.start, args.start + args.num, 100):
-        logging.info('querying arxiv api for query %s at start_index %d' % (q, k))
+        logging.info('querying arxiv api for query at start_index %d' % (k))
 
         # attempt to fetch a batch of papers from arxiv api
         ntried = 0

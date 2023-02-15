@@ -14,6 +14,7 @@ from contextlib import contextmanager
 
 DATA_DIR = 'data'
 
+
 # -----------------------------------------------------------------------------
 # utilities for safe writing of a pickle file
 
@@ -68,6 +69,7 @@ def open_atomic(filepath, *args, **kwargs):
                 os.fsync(f.fileno())
         os.rename(tmppath, filepath)
 
+
 def safe_pickle_dump(obj, fname):
     """
     prevents a case where one process could be writing a pickle file
@@ -75,15 +77,16 @@ def safe_pickle_dump(obj, fname):
     is to write the pickle file to a temporary file and then move it.
     """
     with open_atomic(fname, 'wb') as f:
-        pickle.dump(obj, f, -1) # -1 specifies highest binary protocol
+        pickle.dump(obj, f, -1)  # -1 specifies highest binary protocol
+
 
 # -----------------------------------------------------------------------------
+
 
 class CompressedSqliteDict(SqliteDict):
     """ overrides the encode/decode methods to use zlib, so we get compressed storage """
 
     def __init__(self, *args, **kwargs):
-
         def encode(obj):
             return sqlite3.Binary(zlib.compress(pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)))
 
@@ -91,6 +94,7 @@ class CompressedSqliteDict(SqliteDict):
             return pickle.loads(zlib.decompress(bytes(obj)))
 
         super().__init__(*args, **kwargs, encode=encode, decode=decode)
+
 
 # -----------------------------------------------------------------------------
 """
@@ -104,30 +108,36 @@ PAPERS_DB_FILE = os.path.join(DATA_DIR, 'papers.db')
 # stores account-relevant info, like which tags exist for which papers
 DICT_DB_FILE = os.path.join(DATA_DIR, 'dict.db')
 
+
 def get_papers_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     pdb = CompressedSqliteDict(PAPERS_DB_FILE, tablename='papers', flag=flag, autocommit=autocommit)
     return pdb
+
 
 def get_metas_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     mdb = SqliteDict(PAPERS_DB_FILE, tablename='metas', flag=flag, autocommit=autocommit)
     return mdb
 
+
 def get_tags_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     tdb = CompressedSqliteDict(DICT_DB_FILE, tablename='tags', flag=flag, autocommit=autocommit)
     return tdb
+
 
 def get_last_active_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     ladb = SqliteDict(DICT_DB_FILE, tablename='last_active', flag=flag, autocommit=autocommit)
     return ladb
 
+
 def get_email_db(flag='r', autocommit=True):
     assert flag in ['r', 'c']
     edb = SqliteDict(DICT_DB_FILE, tablename='email', flag=flag, autocommit=autocommit)
     return edb
+
 
 # -----------------------------------------------------------------------------
 """
@@ -137,9 +147,11 @@ our "feature store" is currently just a pickle file, may want to consider hdf5 i
 # stores tfidf features a bunch of other metadata
 FEATURES_FILE = os.path.join(DATA_DIR, 'features.p')
 
+
 def save_features(features):
     """ takes the features dict and save it to disk in a simple pickle file """
     safe_pickle_dump(features, FEATURES_FILE)
+
 
 def load_features():
     """ loads the features dict from disk """
